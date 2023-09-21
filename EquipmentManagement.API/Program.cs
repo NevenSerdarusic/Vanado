@@ -1,3 +1,10 @@
+﻿using Npgsql;
+using Dapper;
+using System.Reflection.PortableExecutable;
+using EquipmentManagement.API.Models;
+using EquipmentManagement.API.Helper;
+using EquipmentManagement.API.Controllers;
+
 namespace EquipmentManagement.API
 {
     public class Program
@@ -6,10 +13,49 @@ namespace EquipmentManagement.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Configuration.AddJsonFile("appsettings.json");
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+
+
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                connection.Open();
+
+                // Create Machines Table
+                string createMachinesTableSql = @"
+                CREATE TABLE IF NOT EXISTS Machines (
+                    Id serial PRIMARY KEY,
+                    Name VARCHAR(50) NOT NULL
+                )";
+
+                
+                connection.Execute(createMachinesTableSql);
+
+                // Create Failures Table
+                string createFailuresTableSql = @"
+                CREATE TABLE IF NOT EXISTS Failures (
+                    Id serial PRIMARY KEY,
+                    Name VARCHAR(50) NOT NULL,
+                    MachineId INT NOT NULL,
+                    Priority INT NOT NULL,
+                    StartTime TIMESTAMP NOT NULL,
+                    EndTime TIMESTAMP,
+                    Description TEXT NOT NULL,
+                    IsResolved BOOLEAN DEFAULT FALSE
+                )";
+
+                
+                connection.Execute(createFailuresTableSql);
+
+
+                connection.Close();
+            }
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -28,6 +74,7 @@ namespace EquipmentManagement.API
 
 
             app.MapControllers();
+
 
             app.Run();
         }
