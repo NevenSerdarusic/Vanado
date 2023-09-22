@@ -119,11 +119,6 @@ public class FailuresController : ControllerBase
             return BadRequest("Page must be a positive integer.");
         }
 
-        if (pageSize < 1)
-        {
-            return BadRequest("PageSize must be a positive integer.");
-        }
-
         // Izračunajte indeks prvog kvara za dohvaćanje
         int startIndex = (page - 1) * pageSize;
 
@@ -137,5 +132,29 @@ public class FailuresController : ControllerBase
 
         return Ok(sortedFailures);
     }
+
+
+    [HttpPut("{id}/status")]
+    public IActionResult UpdateFailureStatus(int id, [FromBody] bool isResolved)
+    {
+        var failure = _failureRepository.GetFailureById(id);
+
+        if (failure == null)
+        {
+            return NotFound("Failure not found.");
+        }
+
+        failure.IsResolved = isResolved;
+
+        var success = _failureRepository.UpdateFailureStatus(failure);
+
+        if (!success)
+        {
+            return StatusCode(500, "Failed to update failure status.");
+        }
+
+        return Ok(failure);
+    }
+
 
 }

@@ -100,20 +100,41 @@ public class MachinesController : ControllerBase
         var machine = _machineRepository.GetMachineById(machineId);
         if (machine == null)
         {
-            return NotFound("Machine not found.");
+            return NotFound("Equipment not found.");
         }
 
         var failures = _failureRepository.GetFailuresByMachineId(machineId);
 
-        // Izračunajte prosječno trajanje svih kvarova na stroju
-        var averageDuration = failures.Average(failure => (failure.EndTime - failure.StartTime)?.TotalHours);
+        // Calculation of the average duration of failures on a specific machine
+        double totalDurationHours = 0;
+
+        foreach (var failure in failures)
+        {
+            if (failure.EndTime.HasValue && failure.StartTime != DateTime.MinValue)
+            {
+                totalDurationHours += (failure.EndTime - failure.StartTime)?.TotalHours ?? 0;
+            }
+        }
+
+        double averageDurationHours = failures.Any() ? totalDurationHours / failures.Count() : 0;
+
+        // Converting to hours, minutes and seconds
+        int averageDurationHoursInt = (int)averageDurationHours;
+        int averageDurationMinutes = (int)((averageDurationHours - averageDurationHoursInt) * 60);
+        int averageDurationSeconds = (int)(((averageDurationHours - averageDurationHoursInt) * 60 - averageDurationMinutes) * 60);
 
         var machineDetails = new
         {
             MachineName = machine.Name,
             Failures = failures,
-            AverageDurationHours = averageDuration
+            AverageDuration = new
+            {
+                Hours = averageDurationHoursInt,
+                Minutes = averageDurationMinutes,
+                Seconds = averageDurationSeconds
+            }
         };
+
 
         return Ok(machineDetails);
     }

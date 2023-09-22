@@ -32,12 +32,15 @@ public class Failure
         {
             if (IsResolved)
             {
-                return DateTime.UtcNow; 
+                return DateTime.UtcNow;
             }
             return null;
         }
-    }
+        set
+        {
 
+        }
+    }
 
     [Required]
     [Column(TypeName = "nvarchar(3000)")]

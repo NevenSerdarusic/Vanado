@@ -156,7 +156,14 @@ public class FailureRepository
             var query = @"
             SELECT *
             FROM Failures
-            ORDER BY Priority ASC, StartTime DESC
+            ORDER BY 
+                CASE Priority
+                    WHEN 3 THEN 1
+                    WHEN 2 THEN 2
+                    WHEN 1 THEN 3
+                    ELSE 4
+                END,
+                StartTime ASC
             OFFSET @StartIndex ROWS FETCH NEXT @PageSize ROWS ONLY
         ";
 
@@ -164,6 +171,21 @@ public class FailureRepository
             return sortedFailures;
         }
     }
+
+    public bool UpdateFailureStatus(Failure failure)
+    {
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            connection.Open();
+
+            var query = "UPDATE Failures SET IsResolved = @IsResolved, EndTime = @EndTime WHERE Id = @Id";
+            var affectedRows = connection.Execute(query, failure);
+
+            return affectedRows > 0;
+        }
+    }
+
+
 
 
 }
