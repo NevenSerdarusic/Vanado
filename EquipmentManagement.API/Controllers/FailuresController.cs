@@ -47,24 +47,19 @@ public class FailuresController : ControllerBase
 
         var activeFailure = _failureRepository.GetActiveFailureByMachineId(failure.MachineId);
 
+        //If there is an active failure on the same machine, do not allow saving a new failure
         if (activeFailure != null)
         {
-            // Postoji aktivan kvar na istom stroju, ne dopustite spremanje novog kvara
             return BadRequest(new { message = "There is an active failure on the same machine, you cannot report a new failure until you resolve first failure" });
         }
 
-
+        // If the string remains default, it warns that the description must be added
         if (failure.Description == "string")
         {
             return BadRequest(new { message = "Failure description is missing, you need to write failure related to equipment" });
         }
 
         var addedFailure = _failureRepository.AddFailure(failure);
-
-        if (addedFailure == null)
-        {
-            return StatusCode(500, "Kvar s istim imenom već postoji.");
-        }
 
         return Ok(addedFailure);
     }
@@ -113,16 +108,16 @@ public class FailuresController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        // Validirajte parametre za paginaciju
+        // Pagination validation
         if (page < 1)
         {
             return BadRequest("Page must be a positive integer.");
         }
 
-        // Izračunajte indeks prvog kvara za dohvaćanje
+        //Calculate the starting index for data pagination.
         int startIndex = (page - 1) * pageSize;
 
-        // Dohvatite kvarove iz repozitorija
+        //Get failures from respository
         var sortedFailures = _failureRepository.GetSortedFailures(startIndex, pageSize);
 
         if (sortedFailures == null || !sortedFailures.Any())
@@ -137,15 +132,19 @@ public class FailuresController : ControllerBase
     [HttpPut("{id}/status")]
     public IActionResult UpdateFailureStatus(int id, [FromBody] bool isResolved)
     {
+        //Retrieve the failure by its ID from the repository
         var failure = _failureRepository.GetFailureById(id);
 
+        //Check if the failure exists.
         if (failure == null)
         {
             return NotFound("Failure not found.");
         }
 
+        //Update the IsResolved property of the failure with the provided isResolved value.
         failure.IsResolved = isResolved;
 
+        //Update the failure's status in the repository.
         var success = _failureRepository.UpdateFailureStatus(failure);
 
         if (!success)

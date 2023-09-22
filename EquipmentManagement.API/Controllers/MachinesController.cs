@@ -97,15 +97,19 @@ public class MachinesController : ControllerBase
     [HttpGet("{machineId}/details")]
     public IActionResult GetMachineDetails(int machineId)
     {
+        //Retrieve the machine by its ID from the machine repository.
         var machine = _machineRepository.GetMachineById(machineId);
+
+        //Check if the machine exists.
         if (machine == null)
         {
             return NotFound("Equipment not found.");
         }
 
+        //Retrieve failures associated with the specified machine from the failure repository.
         var failures = _failureRepository.GetFailuresByMachineId(machineId);
 
-        // Calculation of the average duration of failures on a specific machine
+        //  Calculate the average duration of failures on the specific machine.
         double totalDurationHours = 0;
 
         foreach (var failure in failures)
@@ -118,11 +122,12 @@ public class MachinesController : ControllerBase
 
         double averageDurationHours = failures.Any() ? totalDurationHours / failures.Count() : 0;
 
-        // Converting to hours, minutes and seconds
+        // Convert the average duration to hours, minutes, and seconds.
         int averageDurationHoursInt = (int)averageDurationHours;
         int averageDurationMinutes = (int)((averageDurationHours - averageDurationHoursInt) * 60);
         int averageDurationSeconds = (int)(((averageDurationHours - averageDurationHoursInt) * 60 - averageDurationMinutes) * 60);
 
+        //Create a response object containing machine details, failures, and average duration.
         var machineDetails = new
         {
             MachineName = machine.Name,

@@ -13,6 +13,7 @@ public class MachineRepository
         _connectionString = connectionString;
     }
 
+    #region //CONTROLLER ACTION --> GetMachines
     public IEnumerable<Machine> GetAllMachines()
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -21,7 +22,9 @@ public class MachineRepository
             return connection.Query<Machine>("SELECT * FROM Machines");
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> GetMachine
     public Machine GetMachineById(int id)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -30,7 +33,9 @@ public class MachineRepository
             return connection.QueryFirstOrDefault<Machine>("SELECT * FROM Machines WHERE Id = @Id", new { Id = id });
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> AddMachine
     public Machine AddMachine(Machine machine)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -53,7 +58,9 @@ public class MachineRepository
             return machine;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> UpdateMachine
     public bool UpdateMachine(Machine machine)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -64,7 +71,9 @@ public class MachineRepository
             return affectedRows > 0;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> DeleteMachine
     public bool DeleteMachine(int id)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -75,5 +84,6 @@ public class MachineRepository
             return affectedRows > 0;
         }
     }
+    #endregion
 }
 

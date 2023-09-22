@@ -13,6 +13,7 @@ public class FailureRepository
         _connectionString = connectionString;
     }
 
+    #region //CONTROLLER ACTION --> GetFailures
     public IEnumerable<Failure> GetAllFailures()
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -40,7 +41,9 @@ public class FailureRepository
             return failures;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> GetFailure + UpdateFailureStatus
     public Failure GetFailureById(int id)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -72,8 +75,9 @@ public class FailureRepository
             return failure;
         }
     }
+    #endregion
 
-
+    #region //CONTROLLER ACTION --> AddFailure
     public Failure GetActiveFailureByMachineId(int machineId)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -90,15 +94,16 @@ public class FailureRepository
             return connection.QueryFirstOrDefault<Failure>(query, new { MachineId = machineId });
         }
     }
+    #endregion
 
-
+    #region //CONTROLLER ACTION --> AddFailure
     public Failure AddFailure(Failure failure)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             connection.Open();
 
-            // Dodajte kvar u bazu podataka
+            
             var query = "INSERT INTO Failures (Name, MachineId, Priority, StartTime, Description) VALUES (@Name, @MachineId, @Priority, @StartTime, @Description) RETURNING Id";
             var insertedId = connection.ExecuteScalar<int>(query, failure);
             failure.Id = insertedId;
@@ -106,7 +111,9 @@ public class FailureRepository
             return failure;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> UpdateFailure
     public bool UpdateFailure(Failure failure)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -117,19 +124,9 @@ public class FailureRepository
             return affectedRows > 0;
         }
     }
+    #endregion
 
-    public bool DeleteFailure(int id)
-    {
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            connection.Open();
-            var query = "DELETE FROM Failures WHERE Id = @Id";
-            var affectedRows = connection.Execute(query, new { Id = id });
-            return affectedRows > 0;
-        }
-    }
-
-
+    #region //CONTROLLER: MachinesController ; CONTROLLER ACTION --> GetMachinesDetails
     public IEnumerable<Failure> GetFailuresByMachineId(int machineId)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -146,7 +143,22 @@ public class FailureRepository
             return failures;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> DeleteFailure
+    public bool DeleteFailure(int id)
+    {
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            connection.Open();
+            var query = "DELETE FROM Failures WHERE Id = @Id";
+            var affectedRows = connection.Execute(query, new { Id = id });
+            return affectedRows > 0;
+        }
+    }
+    #endregion
+
+    #region //CONTROLLER ACTION --> GetSortedFailures
     public IEnumerable<Failure> GetSortedFailures(int startIndex, int pageSize)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -171,7 +183,9 @@ public class FailureRepository
             return sortedFailures;
         }
     }
+    #endregion
 
+    #region //CONTROLLER ACTION --> UpdateFailureStatus
     public bool UpdateFailureStatus(Failure failure)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
@@ -184,6 +198,7 @@ public class FailureRepository
             return affectedRows > 0;
         }
     }
+    #endregion
 
 
 

@@ -36,10 +36,6 @@ public class Failure
             }
             return null;
         }
-        set
-        {
-
-        }
     }
 
     [Required]
