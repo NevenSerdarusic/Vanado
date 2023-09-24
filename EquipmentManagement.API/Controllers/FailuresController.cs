@@ -10,10 +10,12 @@ namespace EquipmentManagement.API.Controllers;
 public class FailuresController : ControllerBase
 {
     private readonly FailureRepository _failureRepository;
+    private readonly MachineRepository _machineRepository;
 
     public FailuresController(IConfiguration configuration)
     {
         _failureRepository = new FailureRepository(configuration.GetConnectionString("DefaultConnection"));
+        _machineRepository = new MachineRepository(configuration.GetConnectionString("DefaultConnection"));
     }
 
     // GET api/failures
@@ -45,18 +47,32 @@ public class FailuresController : ControllerBase
             return BadRequest();
         }
 
+        //Check if there is a machine with a matching MachineId
+        var machine = _machineRepository.GetMachineById(failure.MachineId);
+        if (machine == null) 
+        {
+            return BadRequest(new { message = "Machine with the specified MachineId does not exist." });
+        }
+
+
+        //Check if there is an active failure on the same machine, do not allow saving a new failure
         var activeFailure = _failureRepository.GetActiveFailureByMachineId(failure.MachineId);
 
-        //If there is an active failure on the same machine, do not allow saving a new failure
         if (activeFailure != null)
         {
             return BadRequest(new { message = "There is an active failure on the same machine, you cannot report a new failure until you resolve first failure" });
         }
 
-        // If the string remains default, it warns that the description must be added
+        //Check if the string remains default, it warns that the description must be added
         if (failure.Description == "string")
         {
             return BadRequest(new { message = "Failure description is missing, you need to write failure related to equipment" });
+        }
+
+        //Check if the status is set to true, if it is warn that the status must be set to false
+        if (failure.IsResolved)
+        {
+            return BadRequest(new { message = "If you are reporting a failure on equipment, the status should be false." });
         }
 
         var addedFailure = _failureRepository.AddFailure(failure);

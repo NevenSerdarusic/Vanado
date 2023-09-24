@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Principal;
+using System.Text.Json.Serialization;
 
 namespace EquipmentManagement.API.Models;
 
@@ -17,6 +18,7 @@ public class Failure
     [Required]
     public int MachineId { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("MachineId")]
     public Machine? Machine { get; set; }
 

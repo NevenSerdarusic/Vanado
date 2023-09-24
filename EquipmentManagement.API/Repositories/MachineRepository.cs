@@ -24,7 +24,7 @@ public class MachineRepository
     }
     #endregion
 
-    #region //CONTROLLER ACTION --> GetMachine
+    #region //CONTROLLER: MachineController CONTROLLER ACTION --> GetMachine + CONTROLLER: FailuresController CONTROLLER ACTION --> AddFailure
     public Machine GetMachineById(int id)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
