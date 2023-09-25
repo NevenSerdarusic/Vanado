@@ -28,17 +28,7 @@ public class Failure
     [Required]
     public DateTime StartTime { get; set; }
 
-    public DateTime? EndTime
-    {
-        get
-        {
-            if (IsResolved)
-            {
-                return DateTime.UtcNow;
-            }
-            return null;
-        }
-    }
+    public DateTime? EndTime { get; set; }
 
     [Required]
     [Column(TypeName = "nvarchar(3000)")]

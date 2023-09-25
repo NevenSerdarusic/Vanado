@@ -77,7 +77,7 @@ public class FailureRepository
     }
     #endregion
 
-    #region //CONTROLLER ACTION --> AddFailure
+    #region //CONTROLLER ACTION --> AddFailure + CONTROLLER ACTION --> UpdateFailure
     public Failure GetActiveFailureByMachineId(int machineId)
     {
         using (var connection = new NpgsqlConnection(_connectionString))

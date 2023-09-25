@@ -21,27 +21,27 @@ public class MachineControllerTests
         _machinesController = new MachinesController(configuration);
     }
 
-    //[Fact]
-    //public void Test_AddMachine_ValidData()
-    //{
-    //    //ARRANGE
-    //    var controller = _machinesController;
+    [Fact]
+    public void Test_AddMachine_ValidData()
+    {
+        //ARRANGE
+        var controller = _machinesController;
 
-    //    var validMachine = new Machine
-    //    {
-    //        Name = "Pokretna traka"
-    //    };
+        var validMachine = new Machine
+        {
+            Name = "Pokretna traka"
+        };
 
-    //    //ACT
-    //    var result = controller.AddMachine(validMachine) as OkObjectResult;
+        //ACT
+        var result = controller.AddMachine(validMachine) as OkObjectResult;
 
-    //    //ASSERT
-    //    Assert.NotNull(result);
-    //    Assert.Equal(200, result.StatusCode);
+        //ASSERT
+        Assert.NotNull(result);
+        Assert.Equal(200, result.StatusCode);
 
-    //    var adddedMAchine = result.Value as Machine;
-    //    Assert.NotNull(adddedMAchine);
-    //}
+        var adddedMAchine = result.Value as Machine;
+        Assert.NotNull(adddedMAchine);
+    }
 
     [Fact]
     public void Test_UpdateMachine_ValidData()
