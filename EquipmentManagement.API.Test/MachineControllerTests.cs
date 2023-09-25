@@ -14,7 +14,7 @@ public class MachineControllerTests
     public MachineControllerTests()
     {
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.Development.json") 
+            .AddJsonFile("appsettings.json") 
             .Build();
 
         // IConfiguration injection
@@ -29,7 +29,7 @@ public class MachineControllerTests
 
         var validMachine = new Machine
         {
-            Name = "Pokretna traka"
+            Name = "Termouljna etažna peć"
         };
 
         //ACT
