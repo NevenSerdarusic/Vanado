@@ -45,6 +45,12 @@ public class MachinesController : ControllerBase
             return BadRequest();
         }
 
+        //Check if the string remains default in Machine Name, if it is warn that the name must be added
+        if (machine.Name == "string")
+        {
+            return BadRequest(new { message = "Equipment name cant be default string, you need to write failure name to the related equipment" });
+        }
+
         var addedMachine = _machineRepository.AddMachine(machine);
 
         if (addedMachine == null)

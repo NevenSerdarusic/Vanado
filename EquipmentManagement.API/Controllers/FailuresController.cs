@@ -63,13 +63,13 @@ public class FailuresController : ControllerBase
             return BadRequest(new { message = "There is an active failure on the same equipment, you cannot report a new failure until you resolve first failure" });
         }
 
-        //Check if the string remains default in Machine Name, if it is warn that the name must be added
+        //Check if the string remains default in Failure Name, if it is warn that the name must be added
         if (failure.Name == "string")
         {
             return BadRequest(new { message = "Failure name cant be default string, you need to write failure name to the related equipment" });
         }
 
-        //Check if the string remains default in Machine Description, if it is warn that the description must be added
+        //Check if the string remains default in Failure Description, if it is warn that the description must be added
         if (failure.Description == "string")
         {
             return BadRequest(new { message = "Failure description cant be default string, you need to write failure description to the related equipment" });
@@ -113,6 +113,18 @@ public class FailuresController : ControllerBase
             {
                 return BadRequest(new { message = "There is an active failure on the new equipment, you cannot update the failure until you resolve the active failure on the new equipment." });
             }
+        }
+
+        // Check if the provided EndTime is valid and greater than or equal to StartTime
+        if (updatedFailure.EndTime.HasValue && updatedFailure.EndTime < updatedFailure.StartTime)
+        {
+            return BadRequest(new { message = "EndTime must be greater than or equal to StartTime." });
+        }
+
+        // Automatically set isResolved to true if a valid EndTime is provided
+        if (updatedFailure.EndTime.HasValue)
+        {
+            updatedFailure.IsResolved = true;
         }
 
 
