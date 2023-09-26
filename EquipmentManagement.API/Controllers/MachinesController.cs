@@ -116,33 +116,42 @@ public class MachinesController : ControllerBase
         var failures = _failureRepository.GetFailuresByMachineId(machineId);
 
         //  Calculate the average duration of failures on the specific machine.
-        double totalDurationHours = 0;
+        double totalDurationSeconds = 0;
+        int failureCount = 0;
 
         foreach (var failure in failures)
         {
             if (failure.EndTime.HasValue && failure.StartTime != DateTime.MinValue)
             {
-                totalDurationHours += (failure.EndTime - failure.StartTime)?.TotalHours ?? 0;
+                //If the failure is complete, calculate the duration in seconds.
+                totalDurationSeconds += (failure.EndTime.Value - failure.StartTime).TotalSeconds;
             }
+            else
+            {
+                //If the breakdown is not over yet, take the current time as endTime and calculate the duration until the current time.
+                totalDurationSeconds += (DateTime.Now - failure.StartTime).TotalSeconds;
+            }
+
+            failureCount++;
         }
 
-        double averageDurationHours = failures.Any() ? totalDurationHours / failures.Count() : 0;
+        //Calculate the average duration in seconds.
+        double averageDurationSeconds = failureCount > 0 ? totalDurationSeconds / failureCount : 0;
 
-        // Convert the average duration to hours, minutes, and seconds.
-        int averageDurationHoursInt = (int)averageDurationHours;
-        int averageDurationMinutes = (int)((averageDurationHours - averageDurationHoursInt) * 60);
-        int averageDurationSeconds = (int)(((averageDurationHours - averageDurationHoursInt) * 60 - averageDurationMinutes) * 60);
+        //Convert average duration to DD:HH:MM:SS format.
+        TimeSpan averageDurationTimeSpan = TimeSpan.FromSeconds(averageDurationSeconds);
 
-        //Create a response object containing machine details, failures, and average duration.
+        //Create a variable with the average duration.
         var machineDetails = new
         {
             MachineName = machine.Name,
             Failures = failures,
             AverageDuration = new
             {
-                Hours = averageDurationHoursInt,
-                Minutes = averageDurationMinutes,
-                Seconds = averageDurationSeconds
+                Days = averageDurationTimeSpan.Days,
+                Hours = averageDurationTimeSpan.Hours,
+                Minutes = averageDurationTimeSpan.Minutes,
+                Seconds = averageDurationTimeSpan.Seconds
             }
         };
 
